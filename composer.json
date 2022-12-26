@@ -1,0 +1,43 @@
+{
+    "name": "codedhub/roicalculus",
+    "description": "a laravel package that calculates the return on investment, earnings and net profits very useful for autotrading hyip,investment and trading websites.",
+    "type": "library",
+
+    "license": "mit",
+    "autoload": {
+        "psr-4": {
+            "Codedhub\\Roicalculus\\": "src/"
+        }
+    },
+
+
+    "authors": [
+        {
+            "name": "Chibuike Okoye"
+        }
+    ],
+
+    "extra": {
+
+        "laravel": {
+
+        "providers": [
+
+        "Codedhub\\Roicalculus\\RoicalculusServiceProvider"
+
+        ],
+
+        "aliases": {
+
+        "Roicalculus": "Codedhub\\Roicalculus\\Facade"
+
+        }
+
+        }
+
+        },
+
+
+
+    "minimum-stability": "dev"
+}
