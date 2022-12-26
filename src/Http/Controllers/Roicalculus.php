@@ -9,10 +9,11 @@ use App\Http\Controllers\Controller;
 class Roicalculus extends Controller
 
 {
-    
-    public function index()   
+
+    public function index()
     {
-        
+
         return view('coded::calculate');
-    } 
+    }
+
 }
