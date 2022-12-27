@@ -15,10 +15,14 @@ class RoicalculusServiceProvider extends serviceProvider
         $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
 
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'coded');
+
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+
     }
 
     public function register()
 
     {
+
     }
 }
