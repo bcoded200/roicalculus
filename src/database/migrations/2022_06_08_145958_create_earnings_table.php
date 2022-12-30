@@ -31,7 +31,7 @@ class CreateEarningsTable extends Migration
             $table->integer('reinvest')->nullable();
             $table->string('email')->nullable();
             $table->string('method')->nullable();
-            // $table->foreignId('plan_id')->constrained('plans')->onDelete("cascade")->onUpdate("cascade");
+             $table->foreignId('plan_id')->constrained('plans')->onDelete("cascade")->onUpdate("cascade");
 
             $table->timestamps();
         });

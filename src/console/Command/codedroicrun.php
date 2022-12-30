@@ -2,11 +2,13 @@
 
 namespace Codedhub\Roicalculus\Console\Command;
 
+use Codedhub\Roicalculus\helpers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class codedroicrun extends Command
 {
+    use helpers;
     public $count;
 
     /**
@@ -230,12 +232,5 @@ class codedroicrun extends Command
 
 
 
-      static function getPercentage($PercentageAmount, $MoneyAmount)
-      {
-       $num = $MoneyAmount; //300
-       $percent = $PercentageAmount; //3.8
-       return $calc = $percent / 100 * $num;
 
-
-    }
 }

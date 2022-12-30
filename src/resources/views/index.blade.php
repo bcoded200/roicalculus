@@ -42,7 +42,7 @@
     </p>
     @if (session('success'))
         <div class="alert alert-info">
-            {{ session::get('success') }}
+            {{ session('success') }}
         </div>
     @endif
 
@@ -52,19 +52,30 @@
 
         <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Handle</th>
+              <th scope="col">AMOUNT</th>
+              <th scope="col">PLAN NAME</th>
+              <th scope="col">EARNED</th>
+              <th scope="col">DATE INVESTED</th>
+               <th scope="col">END DATE</th>
+                <th scope="col">EXPECTED ROI</th>
+                 <th scope="col">NEXT PROFIT</th>
             </tr>
           </thead>
           <tbody>
+          @forelse($invested as $earning)
             <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>mdo</td>
+              <th scope="row">{{ config('codedroi.roi_currency').number_format($earning->amount_invested,2) }}</th>
+              <td>{{config('codedroi.roi_currency').$earning->plan_name}}</td>
+              <td>{{config('codedroi.roi_currency').$earning->earned_amount}}</td>
+                 <td>{{date("jS M Y h:i:s a", strtotime($earning->date_invested))}}</td>
+              <td>{{date("jS M Y h:i:s a", strtotime($earning->end_date))}}</td>
+              <td>{{config('codedroi.roi_currency').$earning->expected_return}}</td>
+              <td>{{date("jS M  Y h:i:s a", strtotime($earning->nextprofit_date))}}</td>
             </tr>
+          @empty
+            no earnings found
+          @endforelse
+            
 
           </tbody>
     </table>
