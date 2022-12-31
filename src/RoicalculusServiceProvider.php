@@ -11,37 +11,39 @@ use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
 class RoicalculusServiceProvider extends serviceProvider
-
 {
     public $codedroi;
 
     public function boot()
-
     {
 
         $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
 
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'coded');
 
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
         $this->publishes([
-            __DIR__.'/config/codedroi.php' => config_path('codedroi.php'),], 'config');
+            __DIR__ . '/config/codedroi.php' => config_path('codedroi.php'),
+        ], 'config');
 
         $this->publishes([
-            __DIR__ . '/resources/views' => resource_path('views/codedhub'),], 'views');
+            __DIR__ . '/resources/views' => resource_path('views/codedhub'),
+        ], 'views');
 
 
         $this->publishes([
-            __DIR__.'/resources/assets' => public_path('codedassets'),], 'assets');
+            __DIR__ . '/resources/assets' => public_path('codedassets'),
+        ], 'assets');
 
-            $this->publishes([
-                __DIR__.'/database/seeders' => database_path('seeders'),], 'seeders');
+        $this->publishes([
+            __DIR__ . '/database/seeders' => database_path('seeders'),
+        ], 'seeders');
 
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                codedroicrun::class,
+                    codedroicrun::class,
             ]);
 
             $this->app->booted(function () {
@@ -61,19 +63,19 @@ class RoicalculusServiceProvider extends serviceProvider
     }
 
     public function register()
-
     {
 
 
     }
 
-    protected function loadSeeders($seed_list){
+    protected function loadSeeders($seed_list)
+    {
         $this->callAfterResolving(DatabaseSeeder::class, function ($seeder) use ($seed_list) {
-                    foreach ((array) $seed_list as $path) {
-                        $seeder->call($seed_list);
-                        // here goes the code that will print out in console that the migration was succesful
-                    }
-                });
+            foreach ((array) $seed_list as $path) {
+                $seeder->call($seed_list);
+                // here goes the code that will print out in console that the migration was succesful
             }
+        });
+    }
 
 }

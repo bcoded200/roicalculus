@@ -46,200 +46,205 @@ class codedroicrun extends Command
     public function handle()
     {
 
-        $date = $this->realDate();
 
 
-        $earningsModel =  earnings::get();
+         //get the current live date
+         $date = $this->realDate();
+
+         $earningsModel = earnings::get();
+
+         foreach ($earningsModel as $data)
+         {
+
+             $allplan = calcplan::where("id", $data->plan_id)->get();
+
+            // $wallets = wallet::where("user_id",$data->user_id)->get();
 
 
-        foreach ($earningsModel as $data) {
-
-
-            $allplan = calcplan::where("id", $data->plan_id)->get();
-
-            $wallets = wallet::where("user_id", $data->user_id)->get();
-
-            foreach ($allplan as $allplans)
-            {
-
-                foreach($wallets as $wallet)
-            {
-
-                //get the investment number of days
-             $duration = $allplans->duration;
-             $duration = str_replace("Days"," ",$duration);
-             $duration = intval($duration);
-
-            //increment the profit block
-
-             if($date > $data->nextprofit_date)//be careful with this line , otherwise the sky will fall on your head!!
+             foreach ($allplan as $allplans)
              {
-                /**
-                 * ## logic for incrementing the ongoin plans here!!
-                 *
-                 * get the payout  times dynamically based on selected plan and
-                 * increment profits according to payout times
-                 */
 
-                 $increment_time = $allplans->payout;
-                 $increment_time = str_replace("day", " ",$increment_time);
-                 $increment_time = intval($increment_time);
+        //    foreach($wallets as $wallet)
 
+                 //get the investment number of days
+                $duration = $allplans->duration;
+                $duration = $this->getDuration($duration);
 
-                 //calculate the next profit date
-                $next_profit_date = date('Y-m-d h:i:s',strtotime("+$increment_time day", strtotime($date)));
+             //increment the profit block
 
-                //get the amount the user invested
-                $invested_amount = $data->amount_invested;
-
-                //get the percentage amount for each  plan invested on
-                $percent = $allplans->percentage;
-
-
-                //calculate the plan percentage with the amount, user invested
-                $daily_roi = $this->getPercentage($percent,$invested_amount);
-
-                /**
-                 * increment the user profit with the calculated percentage and wait for next profit date
-                 */
-
+              if($date > $data->nextprofit_date)//be careful with this line ,
+              //otherwise the sky will fall on your head!!
+              {
                  /**
-                  * codedweb changed  the old method
-                  * $oldbalance+= $data->earned_amount+ $daily_roi; to the calcbalnce below!
+                  * ## logic for incrementing the ongoin plans here!!
+                  *
+                  * get the payout  times dynamically based on selected plan and
+                  * increment profits according to payout times
                   */
 
-                   //get the old balance and add to the new balance
-                   $calcbalance = $data->earned_amount + $daily_roi;
+                  $increment_time = $allplans->payout;
+                  $increment_time = $this->getPayoutDays($increment_time);
+
+                  //calculate the next profit date
+                    $next_profit_date = $this->nextProfitCount($increment_time);
+
+                 //get the amount the user invested
+                 $invested_amount = $data->amount_invested;
+
+                 //get the percentage amount for each  plan invested on
+                 $percent = $allplans->percentage;
 
 
-                    if($data->earnings_action == 1)//1 means pause 0 means play
-                    {
+                 //calculate the plan percentage with the amount, user invested
+                 $daily_roi = $this->getPercentage($percent,$invested_amount);
 
-                        echo   $data->plan_name.' '. 'contract with invested amount of'.' '.$data->amount_invested.' '
-                        .'has been paused!!';
+                 /**
+                  * increment the user profit with the calculated percentage and wait for next profit date
+                  */
 
-                    }elseif($date > $data->end_date)
-                    {
+                  /**
+                   * codedweb changed  the old method
+                   * $oldbalance+= $data->earned_amount+ $daily_roi; to the calcbalnce below!
+                   */
 
-                        // foreach($wallets as $wallet)
-                        // {
-
-
-                        $data->expired = 1;
-                        $data->update();
-
-
-                        $old = $wallet->coin_balance + $data->expected_return + $data->amount_invested;
-                        $wallet->coin_balance =$old;
-                        $wallet->update();
+                    //get the old balance and add to the new balance
+                    $calcbalance = $data->earned_amount + $daily_roi;
 
 
+                     if($data->earnings_action == 1)//1 means pause 0 means play
+                     {
 
-                         $details = [
-                            'planname' => $allplans->bundle,
-                            'amountinvested' => $data->amount_invested
+                         echo   $data->plan_name.' '. 'contract with invested amount of'.' '.$data->amount_invested.' '
+                         .'has been paused!!';
 
-                           ];
-
-                             // Mail::to($data->email)->send(new endtrademail($details));
-
-                        //corrected
-                        $this->count = DB::table(config('codedroi.earnings_table'))->where("end_date", "<", $date)->count();
-                        echo "$this->count contract has ended";
-
-                        /**
-                         * copy out to expired contract table.
-                         */
-                        // $copyout = new expiredcontract;
-                        // $copyout->amount_invested =  $data->amount_invested;
-                        // $copyout->plan_name =  $data->plan_name;
-                        // $copyout->earned_amount =  $data->earned_amount;
-                        // $copyout->date_invested =  $data->date_invested;
-                        // $copyout->end_date =  $data->end_date;
-                        // // 'total_return',
-                        // $copyout->expected_return =  $data->expected_return;
-                        // $copyout->nextprofit_date =  $data->nextprofit_date;
-                        // $copyout->user_id =  $data->user_id;
-                        // $copyout->invested_by =  $data->invested_by;
-                        // $copyout->counter =  $data->counter;
-                        // $copyout->earnings_action =  $data->earnings_action;
-                        // $copyout->expired =  $data->expired;
-                        // $copyout->reinvest =  $data->reinvest;
-                        // $copyout->email =  $data->email;
-                        // $copyout->save();
-
-                        //$data->delete(); delete expired contracts
-
-                        // }
+                     }elseif($date > $data->end_date)
+                     {
 
 
-                    }
-                    elseif($data->earned_amount == $data->expected_return)
-                    {
-
-                        $this->count = earnings::where("earned_amount", "==", $data->expected_return)->count();
-                        echo "$this->count contract has reached its earning limit! and queued for deletion";
-                    }
-                    else
-                    {
-
-                  //var_dump($data);
-                //   $this->count = earnings::where("plan_name",$allplans->bundle)->count();
-
-                    //update the earnings model with the new record / result
-                    $oldcounter = 1;
-                    $updatecounter = $data->counter + $oldcounter;
-                    $data->earned_amount = $calcbalance;
-                    $data->nextprofit_date = $next_profit_date;
-                    $data->counter = $updatecounter;
-                    $data->update();
-
-                    /**
-                     * Email the clients after successfull Trading
-                     * Crafted By (Codedwebltd)
-                     */
-
-                    $details = [
-
-                        'planname' => $allplans->bundle,
-                        'todaysprofit' => $daily_roi,
-                        'daystraded' => $updatecounter,
-                        'nextprofitdate' =>  $next_profit_date,
-                        'totalearned' => $calcbalance,
-                        'invested_by' =>  $data->invested_by,
-                        'subtotal' => $allplans->duration
+                         // foreach($wallets as $wallet)
+                         // {
 
 
-                       ];
-
-                      //Mail::to($data->email)->send(new notifytrading ($details));
-
-
-                        echo $this->count."Contracts Traded! $data->counter Times".PHP_EOL;
-                    }
-
-                }
+                         $data->expired = 1;
+                         $data->update();
 
 
-                } //EOF for wallet
+                         //logic to decrement wallet balance
+                        //  if($data->method == 'LO_BALANCE')//new
+                        //  {
 
-            }//EOF plan foreach
+
+
+                        //      $loancredit = $wallet->loan_balance + $data->expected_return + $data->amount_invested;
+                        //      $wallet->loan_balance =$loancredit;
+                        //      $wallet->update();
+
+
+                        //  }else
+                        //  {
+                        //      $old = $wallet->coin_balance + $data->expected_return + $data->amount_invested;
+                        //      $wallet->coin_balance =$old;
+                        //      $wallet->update();
+                        //  }
 
 
 
 
-        } //EOF for earnings
+                          $details = [
+                             'planname' => $allplans->bundle,
+                             'amountinvested' => $data->amount_invested
 
-        return true;
+                            ];
 
-      }//EOF handle Braces
+                            //    Mail::to($data->email)->send(new endtrademail($details));
+
+                         //corrected
+                         $this->count = earnings::where("end_date", "<", $date)->count();
+                         echo "$this->count contract has ended";
+
+                        //  $copyout = new expiredcontract;
+                        //  $copyout->amount_invested =  $data->amount_invested;
+                        //  $copyout->plan_name =  $data->plan_name;
+                        //  $copyout->earned_amount =  $data->earned_amount;
+                        //  $copyout->date_invested =  $data->date_invested;
+                        //  $copyout->end_date =  $data->end_date;
+                        //  // 'total_return',
+                        //  $copyout->expected_return =  $data->expected_return;
+                        //  $copyout->nextprofit_date =  $data->nextprofit_date;
+                        //  $copyout->user_id =  $data->user_id;
+                        //  $copyout->invested_by =  $data->invested_by;
+                        //  $copyout->counter =  $data->counter;
+                        //  $copyout->earnings_action =  $data->earnings_action;
+                        //  $copyout->expired =  $data->expired;
+                        //  $copyout->reinvest =  $data->reinvest;
+                        //  $copyout->email =  $data->email;
+                        //  $copyout->save();
+
+                        //  $data->delete();
 
 
 
 
+                         // }
+
+
+                     }
+                     elseif($data->earned_amount == $data->expected_return)
+                     {
+                         $this->count = earnings::where("earned_amount", "==", $data->expected_return)->count();
+                         echo "$this->count contract has reached its earning limit! and queued for deletion";
+                     }
+                     else
+                     {
+
+                   //var_dump($data);
+                   $this->count = earnings::where("plan_name",$allplans->bundle)->count();
+
+                     //update the earnings model with the new record / result
+                     $oldcounter = 1;
+                     $updatecounter = $data->counter + $oldcounter;
+                     $data->earned_amount = $calcbalance;
+                     $data->nextprofit_date = $next_profit_date;
+                     $data->counter = $updatecounter;
+                     $data->update();
+
+                     /**
+                      * Email the clients after successfull Trading
+                      * Crafted By (Codedwebltd)
+                      */
+
+                     $details = [
+
+                         'planname' => $allplans->bundle,
+                         'todaysprofit' => $daily_roi,
+                         'daystraded' => $updatecounter,
+                         'nextprofitdate' =>  $next_profit_date,
+                         'totalearned' => $calcbalance,
+                         'invested_by' =>  $data->invested_by,
+                         'subtotal' => $allplans->duration
+
+
+                        ];
+
+                    //    Mail::to($data->email)->send(new notifytrading($details));
+
+                         echo $this->count."Contracts Traded! $data->counter Times".PHP_EOL;
+                     }
+
+                 }
+
+
+             //EOF for wallet
+
+             }//EOF plan foreach
 
 
 
 
+         } //EOF for earnings
+
+
+
+       }//EOF handle Braces
 
 }

@@ -46,6 +46,7 @@ trait helpers
      */
     public function nextProfitCount($Count)
     {
+
         $increment_time =  $Count;
          $next_profit_date = date('Y-m-d h:i:s',strtotime("+$increment_time day", strtotime($this->realDate())));
         return $next_profit_date;
@@ -74,8 +75,16 @@ trait helpers
         return $finaldate;
     }
 
+    public function getIncrementCount($string)
+    {
+        $increment_time = $string;
+        $increment_time = str_replace(["day","Day"], " ",$increment_time);
+        return $increment_time;
+    }
 
-    public function DateDiff($date1, $date2){
+
+    public function DateDiff($date1, $date2)
+    {
         //formulate the difference b/w two dates
        $date1 = strtotime($date1);
        $date2 = strtotime($date2);
