@@ -23,7 +23,8 @@ class CreateEarningsTable extends Migration
             // $table->integer('total_return')->nullable();
             $table->string('expected_return')->nullable();
             $table->datetime('nextprofit_date')->nullable();
-            $table->foreignId("user_id")->constrained("users")->onDelete("cascade")->onUpdate("cascade");
+            $table->bigInteger("user_id");
+            //->constrained("users")->onDelete("cascade")->onUpdate("cascade");
             $table->string('invested_by')->nullable();
             $table->string('counter')->nullable();
             $table->string('earnings_action')->nullable();
@@ -31,7 +32,7 @@ class CreateEarningsTable extends Migration
             $table->integer('reinvest')->nullable();
             $table->string('email')->nullable();
             $table->string('method')->nullable();
-             $table->foreignId('plan_id')->constrained('plans')->onDelete("cascade")->onUpdate("cascade");
+             $table->foreignId('plan_id')->constrained('calcplans')->onDelete("cascade")->onUpdate("cascade");
 
             $table->timestamps();
         });

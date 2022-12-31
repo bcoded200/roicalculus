@@ -41,7 +41,7 @@
 
     </p>
     @if (session('success'))
-        <div class="alert alert-info">
+        <div class="alert alert-success">
             {{ session('success') }}
         </div>
     @endif
@@ -69,13 +69,13 @@
               <td>{{config('codedroi.roi_currency').$earning->earned_amount}}</td>
                  <td>{{date("jS M Y h:i:s a", strtotime($earning->date_invested))}}</td>
               <td>{{date("jS M Y h:i:s a", strtotime($earning->end_date))}}</td>
-              <td>{{config('codedroi.roi_currency').$earning->expected_return}}</td>
+              <td>{{config('codedroi.roi_currency').number_format($earning->expected_return,2)}}</td>
               <td>{{date("jS M  Y h:i:s a", strtotime($earning->nextprofit_date))}}</td>
             </tr>
           @empty
             no earnings found
           @endforelse
-            
+
 
           </tbody>
     </table>

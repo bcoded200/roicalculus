@@ -3,6 +3,9 @@
 namespace Codedhub\Roicalculus\Console\Command;
 
 use Codedhub\Roicalculus\helpers;
+use Codedhub\Roicalculus\Models\calcplan;
+use Codedhub\Roicalculus\Models\earnings;
+use Codedhub\Roicalculus\Models\wallet;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -42,15 +45,19 @@ class codedroicrun extends Command
      */
     public function handle()
     {
+
         $date = $this->realDate();
 
-        $earningsModel =  DB::table(config('codedroi.earnings_table'))->get();
+
+        $earningsModel =  earnings::get();
+
 
         foreach ($earningsModel as $data) {
 
-            $allplan = DB::table(config('codedroi.plans_table'))->where("id", $data->plan_id)->get();
 
-            $wallets = DB::table(config('codedroi.wallet_table'))->where("user_id", $data->user_id)->get();
+            $allplan = calcplan::where("id", $data->plan_id)->get();
+
+            $wallets = wallet::where("user_id", $data->user_id)->get();
 
             foreach ($allplan as $allplans)
             {
@@ -170,7 +177,7 @@ class codedroicrun extends Command
                     elseif($data->earned_amount == $data->expected_return)
                     {
 
-                        $this->count = DB::table(config('codedroi.earnings_table'))->where("earned_amount", "==", $data->expected_return)->count();
+                        $this->count = earnings::where("earned_amount", "==", $data->expected_return)->count();
                         echo "$this->count contract has reached its earning limit! and queued for deletion";
                     }
                     else
@@ -223,9 +230,11 @@ class codedroicrun extends Command
 
         } //EOF for earnings
 
-
+        return true;
 
       }//EOF handle Braces
+
+
 
 
 
