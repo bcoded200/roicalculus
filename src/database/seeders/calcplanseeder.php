@@ -1,13 +1,16 @@
 <?php
 
-namespace Codedhub\Roicalculus\seeders;
+// namespace Codedhub\Roicalculus\Database\Seeders;
+/**
+ * seeder not used in our package!! ignore this line and the whole file
+ * **/
 use Codedhub\Roicalculus\Models\calcplan;
 use \Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class Planseeder extends Seeder
+class calcplanseeder extends Seeder
 {
     /**
      * Run the database seeds.
